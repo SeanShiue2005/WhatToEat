@@ -1,15 +1,100 @@
 <!DOCTYPE html>
+<html lang="zh-Hant">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>餐廳網站</title>
     <style>
-        @import url(style.css);
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; }
+        header { background-color: #333; color: #fff; padding: 10px 20px; text-align: center; width: 100%; }
+        .container { display: flex; flex-direction: column; align-items: center; width: 100%; }
+        .section { margin: 20px 0; text-align: center; }
+        button { margin-top: 10px; padding: 10px 20px; font-size: 1.2em; }
+        input { margin-top: 10px; display: block; width: calc(100% - 20px); }
+        .back-button { margin-top: 20px; }
     </style>
-    <meta charset="utf-8">
-    <title>等一下吃什麼</title>
-    <script src="index.js"></script>
 </head>
-
 <body>
-    <h1>Hello!!!!sdasda</h1>   
-    <h1>Hello!!!!</h1>
-    <p>world</p>
+    <header>
+        <h1>餐廳網站</h1>
+    </header>
+    <div class="container" id="initial-view">
+        <img src="your-image-url-here.jpg" alt="歡迎圖片" style="max-width: 100%; height: auto;">
+        <button onclick="startSite()">開始</button>
+    </div>
+    <div class="container" id="main-menu" style="display:none;">
+        <div class="section">
+            <button onclick="showSection('add-restaurant')">新增餐廳</button>
+        </div>
+        <div class="section">
+            <button onclick="showSection('filter-restaurant')">篩選餐廳</button>
+        </div>
+        <div class="section">
+            <button onclick="showSection('restaurant-list')">餐廳列表</button>
+        </div>
+    </div>
+    <div class="container" id="sections" style="display:none;">
+        <aside id="add-restaurant" style="display:none;">
+            <h2>新增餐廳</h2>
+            <input type="text" id="restaurant-url" placeholder="輸入餐廳網址">
+            <button onclick="addRestaurant()">新增</button>
+            <button class="back-button" onclick="goBack()">返回</button>
+        </aside>
+        <aside id="filter-restaurant" style="display:none;">
+            <h2>篩選餐廳</h2>
+            <input type="text" id="filter-url" placeholder="輸入篩選關鍵字">
+            <button onclick="filterRestaurant()">篩選</button>
+            <button class="back-button" onclick="goBack()">返回</button>
+        </aside>
+        <main id="restaurant-list" style="display:none;">
+            <h2>餐廳列表</h2>
+            <div id="restaurants"></div>
+            <button class="back-button" onclick="goBack()">返回</button>
+        </main>
+    </div>
+    <script>
+        function startSite() {
+            document.getElementById('initial-view').style.display = 'none';
+            document.getElementById('main-menu').style.display = 'flex';
+        }
+
+        function showSection(sectionId) {
+            document.getElementById('main-menu').style.display = 'none';
+            document.getElementById('sections').style.display = 'block';
+            const sections = document.querySelectorAll('#sections > aside, #sections > main');
+            sections.forEach(section => section.style.display = 'none');
+            document.getElementById(sectionId).style.display = 'block';
+        }
+
+        function goBack() {
+            document.getElementById('sections').style.display = 'none';
+            document.getElementById('main-menu').style.display = 'flex';
+        }
+
+        function addRestaurant() {
+            const url = document.getElementById('restaurant-url').value;
+            if (url) {
+                const restaurantList = document.getElementById('restaurants');
+                const div = document.createElement('div');
+                div.className = 'restaurant';
+                div.innerHTML = `<p>${url}</p>`;
+                restaurantList.appendChild(div);
+                document.getElementById('restaurant-url').value = '';
+            }
+        }
+
+        function filterRestaurant() {
+            const filterUrl = document.getElementById('filter-url').value.toLowerCase();
+            const restaurants = document.getElementsByClassName('restaurant');
+            for (let restaurant of restaurants) {
+                const url = restaurant.innerText.toLowerCase();
+                if (url.includes(filterUrl)) {
+                    restaurant.style.display = 'block';
+                } else {
+                    restaurant.style.display = 'none';
+                }
+            }
+        }
+    </script>
 </body>
+</html>
