@@ -5,18 +5,174 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>餐廳網站 - 篩選餐廳</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="index.js" defer></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background-color: #f8f9fa; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            color: #333; 
+        }
+        header {
+            background-color: rgba(52, 58, 64, 0.8); 
+            color: #fff; 
+            text-align: center; 
+            padding: 20px; 
+            width: 100%; 
+            position: sticky; 
+            top: 0; 
+        }
+        .container {
+            width: 80%; 
+            display: flex; 
+            margin: 20px auto; 
+            background-color: #fff; 
+            padding: 20px; 
+            border-radius: 10px; 
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
+        }
+        .sidebar {
+            width: 30%; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+            border-right: 2px solid #f8f9fa; 
+            padding-right: 20px; 
+        }
+        .main-content {
+            width: 70%; 
+            padding-left: 20px; 
+        }
+        h1 {
+            text-align: center; 
+            color: #fff;  /* 設置標題顏色為白色 */
+            font-size: 2.5em; 
+        }
+        h2 {
+            text-align: center; 
+            color: #343a40; 
+        }
+        .filter-input {
+            display: flex; 
+            align-items: center; 
+            margin-bottom: 10px; 
+        }
+        .filter-input input {
+            width: 100%; 
+            padding: 10px; 
+            border: 1px solid #ccc; 
+            border-radius: 5px; 
+            margin-right: 10px; 
+        }
+        .filter-input button {
+            background-color: #28a745; 
+            color: #fff; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            text-decoration: none; 
+            display: inline-block; 
+        }
+        .filter-input button:hover {
+            background-color: #218838; 
+        }
+        .button {
+            background-color: #28a745; 
+            color: #fff; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            text-decoration: none; 
+            display: inline-block; 
+        }
+        .button:hover {
+            background-color: #218838; 
+        }
+        .back-button {
+            background-color: #007bff; 
+        }
+        .back-button:hover {
+            background-color: #0056b3; 
+        }
+        .restaurants-container {
+            display: none; 
+        }
+    </style>
+    <script>
+        function addFilter() {
+            const filterContainer = document.getElementById('filter-container');
+            const filterInput = document.createElement('div');
+            filterInput.className = 'filter-input';
+            filterInput.innerHTML = `
+                <input type="text" placeholder="輸入篩選關鍵字">
+                <button onclick="removeFilter(this)">移除</button>
+            `;
+            filterContainer.appendChild(filterInput);
+        }
+
+        function removeFilter(button) {
+            const filterInput = button.parentNode;
+            filterInput.parentNode.removeChild(filterInput);
+        }
+
+        function filterRestaurant() {
+            const filterInputs = document.querySelectorAll('.filter-input input');
+            const filters = Array.from(filterInputs).map(input => input.value.trim().toLowerCase());
+            const restaurantsContainer = document.getElementById('restaurants');
+            const restaurants = JSON.parse(localStorage.getItem('restaurants')) || [];
+
+            const filteredRestaurants = restaurants.filter(restaurant =>
+                filters.every(filter => restaurant.toLowerCase().includes(filter))
+            );
+
+            restaurantsContainer.innerHTML = '';
+
+            if (filteredRestaurants.length === 0) {
+                restaurantsContainer.innerHTML = '<p>沒有符合條件的餐廳。</p>';
+            } else {
+                const list = document.createElement('ul');
+                list.style.listStyleType = 'none';
+                filteredRestaurants.forEach(restaurant => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = restaurant;
+                    listItem.style.padding = '10px';
+                    listItem.style.borderBottom = '1px solid #ccc';
+                    list.appendChild(listItem);
+                });
+                restaurantsContainer.appendChild(list);
+            }
+
+            document.querySelector('.restaurants-container').style.display = 'block';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const filterContainer = document.getElementById('filter-container');
+            addFilter();
+        });
+    </script>
 </head>
 <body>
     <header>
         <h1>篩選餐廳</h1>
     </header>
     <div class="container">
-        <input type="text" id="filter-url" placeholder="輸入篩選關鍵字">
-        <button onclick="filterRestaurant()">篩選</button>
-        <a href="menu.html"><button class="back-button">返回</button></a>
-        <h2>餐廳列表</h2>
-        <div id="restaurants"></div>
+        <div class="sidebar">
+            <div id="filter-container"></div>
+            <button onclick="addFilter()" class="button">新增篩選條件</button>
+            <button onclick="filterRestaurant()" class="button">篩選</button>
+            <a href="menu.html" class="button back-button">返回</a>
+        </div>
+        <div class="main-content">
+            <div class="restaurants-container">
+                <h2>餐廳列表</h2>
+                <div id="restaurants"></div>
+            </div>
+        </div>
     </div>
 </body>
 </html>

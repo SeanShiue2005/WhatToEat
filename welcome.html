@@ -5,13 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>餐廳網站 - 歡迎</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: url('food.jpg') no-repeat center center fixed;
+            background-size: 60%; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #fff;
+        }
+        header {
+            background-color: rgba(52, 58, 64, 0.8);
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+            width: 100%;
+            position: absolute;
+            top: 0;
+        }
+        .container {
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 50px 20px;
+            border-radius: 10px;
+        }
+        button {
+            background-color: #28a745;
+            color: #fff;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
 </head>
 <body>
     <header>
         <h1>餐廳網站</h1>
     </header>
     <div class="container">
-        <img src="your-image-url-here.jpg" alt="歡迎圖片" style="max-width: 100%; height: auto;">
+        <img src="food.jpg" alt="歡迎圖片">
         <a href="menu.html"><button>開始</button></a>
     </div>
 </body>
