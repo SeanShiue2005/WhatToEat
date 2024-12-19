@@ -10,13 +10,12 @@
             font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
-            background: url('food.jpg') no-repeat center center fixed;
-            background-size: 60%; 
+            background: #fff; /* 使用全白背景 */
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            color: #fff;
+            color: #000;
         }
         header {
             background-color: rgba(52, 58, 64, 0.8);
@@ -29,9 +28,11 @@
         }
         .container {
             text-align: center;
-            background-color: rgba(0, 0, 0, 0.6);
+            background-color: #fff; /* 變更背景色為白色 */
             padding: 50px 20px;
             border-radius: 10px;
+            margin-top: 150px; /* 調整此處增加距離 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 添加陰影效果 */
         }
         button {
             background-color: #28a745;
@@ -52,7 +53,6 @@
         <h1>餐廳網站</h1>
     </header>
     <div class="container">
-        <img src="food.jpg" alt="歡迎圖片">
         <a href="menu.html"><button>開始</button></a>
     </div>
 </body>

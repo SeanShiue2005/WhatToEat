@@ -7,139 +7,104 @@
     <link rel="stylesheet" href="styles.css">
     <style>
         body {
-            font-family: 'Arial', sans-serif; 
-            margin: 0; 
-            padding: 0; 
-            background-color: #f8f9fa; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            color: #333; 
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #333;
         }
         header {
-            background-color: rgba(52, 58, 64, 0.8); 
-            color: #fff; 
-            text-align: center; 
-            padding: 20px; 
-            width: 100%; 
-            position: sticky; 
-            top: 0; 
+            background-color: rgba(52, 58, 64, 0.8);
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+            width: 100%;
+            position: sticky;
+            top: 0;
         }
         .container {
-            width: 80%; 
-            display: flex; 
-            margin: 20px auto; 
-            background-color: #fff; 
-            padding: 20px; 
-            border-radius: 10px; 
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
+            width: 80%;
+            display: flex;
+            flex-direction: column;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        .sidebar {
-            width: 30%; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 10px; 
-            border-right: 2px solid #f8f9fa; 
-            padding-right: 20px; 
+        .filter-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
         }
-        .main-content {
-            width: 70%; 
-            padding-left: 20px; 
+        .filter-group div {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
         }
-        h1 {
-            text-align: center; 
-            color: #fff;  /* 設置標題顏色為白色 */
-            font-size: 2.5em; 
+        .filter-group label {
+            margin-bottom: 5px;
+            font-weight: bold;
         }
-        h2 {
-            text-align: center; 
-            color: #343a40; 
-        }
-        .filter-input {
-            display: flex; 
-            align-items: center; 
-            margin-bottom: 10px; 
-        }
-        .filter-input input {
-            width: 100%; 
-            padding: 10px; 
-            border: 1px solid #ccc; 
-            border-radius: 5px; 
-            margin-right: 10px; 
-        }
-        .filter-input button {
-            background-color: #28a745; 
-            color: #fff; 
-            padding: 10px 20px; 
-            border: none; 
-            border-radius: 5px; 
-            cursor: pointer; 
-            text-decoration: none; 
-            display: inline-block; 
-        }
-        .filter-input button:hover {
-            background-color: #218838; 
+        .filter-group select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
         .button {
-            background-color: #28a745; 
-            color: #fff; 
-            padding: 10px 20px; 
-            border: none; 
-            border-radius: 5px; 
-            cursor: pointer; 
-            text-decoration: none; 
-            display: inline-block; 
+            background-color: #28a745;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-left: 10px;
         }
         .button:hover {
-            background-color: #218838; 
+            background-color: #218838;
         }
         .back-button {
-            background-color: #007bff; 
+            background-color: #007bff;
         }
         .back-button:hover {
-            background-color: #0056b3; 
+            background-color: #0056b3;
         }
         .restaurants-container {
-            display: none; 
+            display: none;
+            margin-top: 20px;
         }
     </style>
     <script>
-        function addFilter() {
-            const filterContainer = document.getElementById('filter-container');
-            const filterInput = document.createElement('div');
-            filterInput.className = 'filter-input';
-            filterInput.innerHTML = `
-                <input type="text" placeholder="輸入篩選關鍵字">
-                <button onclick="removeFilter(this)">移除</button>
-            `;
-            filterContainer.appendChild(filterInput);
-        }
-
-        function removeFilter(button) {
-            const filterInput = button.parentNode;
-            filterInput.parentNode.removeChild(filterInput);
-        }
-
         function filterRestaurant() {
-            const filterInputs = document.querySelectorAll('.filter-input input');
-            const filters = Array.from(filterInputs).map(input => input.value.trim().toLowerCase());
+            const openingTime = document.getElementById('opening-time').value;
+            const priceRange = document.getElementById('price-range').value;
+            const rating = document.getElementById('rating').value;
+            
             const restaurantsContainer = document.getElementById('restaurants');
             const restaurants = JSON.parse(localStorage.getItem('restaurants')) || [];
 
-            const filteredRestaurants = restaurants.filter(restaurant =>
-                filters.every(filter => restaurant.toLowerCase().includes(filter))
-            );
+            const filteredRestaurants = restaurants.filter(restaurant => {
+                return (openingTime === 'none' || restaurant.openingTime === openingTime) &&
+                       (priceRange === 'none' || restaurant.priceRange === priceRange) &&
+                       (rating === 'none' || restaurant.rating === rating);
+            });
 
             restaurantsContainer.innerHTML = '';
 
             if (filteredRestaurants.length === 0) {
-                restaurantsContainer.innerHTML = '<p>沒有符合條件的餐廳。</p>';
+                restaurantsContainer.innerHTML = '<p>目前無餐廳。</p>';
             } else {
                 const list = document.createElement('ul');
                 list.style.listStyleType = 'none';
                 filteredRestaurants.forEach(restaurant => {
                     const listItem = document.createElement('li');
-                    listItem.textContent = restaurant;
+                    listItem.textContent = restaurant.name;
                     listItem.style.padding = '10px';
                     listItem.style.borderBottom = '1px solid #ccc';
                     list.appendChild(listItem);
@@ -151,8 +116,10 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const filterContainer = document.getElementById('filter-container');
-            addFilter();
+            const restaurantsContainer = document.getElementById('restaurants');
+            if (JSON.parse(localStorage.getItem('restaurants'))?.length === 0) {
+                restaurantsContainer.innerHTML = '<p>目前無餐廳。</p>';
+            }
         });
     </script>
 </head>
@@ -161,17 +128,46 @@
         <h1>篩選餐廳</h1>
     </header>
     <div class="container">
-        <div class="sidebar">
-            <div id="filter-container"></div>
-            <button onclick="addFilter()" class="button">新增篩選條件</button>
+        <div class="filter-group">
+            <div>
+                <label for="opening-time">營業時間</label>
+                <select id="opening-time">
+                    <option value="none">無</option>
+                    <option value="morning">早上</option>
+                    <option value="afternoon">中午</option>
+                    <option value="evening">晚上</option>
+                </select>
+            </div>
+            <div>
+                <label for="price-range">價格</label>
+                <select id="price-range">
+                    <option value="none">無</option>
+                    <option value="100-200">100-200</option>
+                    <option value="200-400">200-400</option>
+                    <option value="400-600">400-600</option>
+                    <option value="600-1000">600-1000</option>
+                    <option value="1000+">1000以上</option>
+                </select>
+            </div>
+            <div>
+                <label for="rating">評價</label>
+                <select id="rating">
+                    <option value="none">無</option>
+                    <option value="5">5顆星</option>
+                    <option value="4">4顆星</option>
+                    <option value="3">3顆星</option>
+                    <option value="2">2顆星</option>
+                    <option value="1">1顆星</option>
+                </select>
+            </div>
             <button onclick="filterRestaurant()" class="button">篩選</button>
-            <a href="menu.html" class="button back-button">返回</a>
         </div>
         <div class="main-content">
             <div class="restaurants-container">
                 <h2>餐廳列表</h2>
                 <div id="restaurants"></div>
             </div>
+            <a href="menu.html" class="button back-button">返回</a>
         </div>
     </div>
 </body>

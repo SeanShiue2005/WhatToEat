@@ -35,7 +35,7 @@
         }
         h1 {
             text-align: center;
-            color: #fff;  /* 設置標題顏色為白色 */
+            color: #343a40;
             font-size: 2.5em;
         }
         h2 {
@@ -56,27 +56,70 @@
         .back-button:hover {
             background-color: #218838;
         }
+        .restaurant-item {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .restaurant-item h3 {
+            margin: 0;
+        }
+        .restaurant-details {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-right: 10px;
+        }
+        .delete-button {
+            background-color: #dc3545;
+            color: #fff;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .delete-button:hover {
+            background-color: #c82333;
+        }
     </style>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const restaurantsContainer = document.getElementById('restaurants');
-            const restaurants = JSON.parse(localStorage.getItem('restaurants')) || [];
+        const restaurants = JSON.parse(localStorage.getItem('restaurants')) || [];
 
+        function deleteRestaurant(index) {
+            restaurants.splice(index, 1);
+            localStorage.setItem('restaurants', JSON.stringify(restaurants));
+            renderRestaurants();
+        }
+
+        function renderRestaurants() {
+            const restaurantsContainer = document.getElementById('restaurants');
+            restaurantsContainer.innerHTML = '';
             if (restaurants.length === 0) {
                 restaurantsContainer.innerHTML = '<p>目前無餐廳。</p>';
             } else {
                 const list = document.createElement('ul');
                 list.style.listStyleType = 'none';
-                restaurants.forEach(restaurant => {
+                restaurants.forEach((restaurant, index) => {
                     const listItem = document.createElement('li');
-                    listItem.textContent = restaurant;
-                    listItem.style.padding = '10px';
-                    listItem.style.borderBottom = '1px solid #ccc';
+                    listItem.className = 'restaurant-item';
+                    listItem.innerHTML = `
+                        <div class="restaurant-details">
+                            <h3>${restaurant.name}</h3>
+                            <span>價格範圍: ${restaurant.priceRange}</span>
+                            <span>評分: ${restaurant.rating} 顆星</span>
+                            <span>營業時間: ${restaurant.openingTime}</span>
+                        </div>
+                        <button class="delete-button" onclick="deleteRestaurant(${index})">刪除</button>
+                    `;
                     list.appendChild(listItem);
                 });
                 restaurantsContainer.appendChild(list);
             }
-        });
+        }
+
+        document.addEventListener('DOMContentLoaded', renderRestaurants);
     </script>
 </head>
 <body>
