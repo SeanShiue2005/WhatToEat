@@ -1,46 +1,5 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <style>
-      #map {
-        height: 400px;
-        width: 60%;
-      }
-      body {
-        font-family: Arial, sans-serif;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-        background-color: #f4f4f4;
-      }
-      button {
-        padding: 10px 20px;
-        font-size: 16px;
-        border: none;
-        border-radius: 5px;
-        background-color: #007bff;
-        color: white;
-        cursor: pointer;
-        transition: background-color 0.3s, transform 0.2s;
-      }
-      button:active {
-        transform: scale(0.95);
-      }
-      button.disabled {
-        background-color: #6c757d;
-        cursor: not-allowed;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="map"></div>
-    <input type="text" id="input">
-    <div id="title"></div>
-    <ul id="results"></ul>
-    <button id="toggleButton" class="disabled">提交</button>
-    <script>(g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})
+
+   (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})
       ({key: "AIzaSyBe_lVY291SKiWQQizdzzME1LvDVYQ3C94", v: "weekly",region:"tw"});
       const button = document.getElementById("toggleButton");
       let map;
@@ -50,7 +9,6 @@
       let token;
       let infoWindow;
       let marker;
-      let placePrediction;
       let request = {
         input: "",
         includedPrimaryTypes: ["restaurant"],
@@ -65,7 +23,6 @@
             // 改變按鈕的狀態
             button.classList.add("disabled");
             button.textContent = "已提交";
-            Get_data(placePrediction.toPlace());
           }
         });
         const position = { lat: 25.150622313721396, lng: 121.7757648486997 };
@@ -86,7 +43,7 @@
           position: position,
           title: "Uluru",
         });
-        infoWindow = new google.maps.InfoWindow({});
+          infoWindow = new google.maps.InfoWindow({});
           token = new google.maps.places.AutocompleteSessionToken();
           title = document.getElementById("title");
           results = document.getElementById("results");
@@ -118,10 +75,10 @@
           results.replaceChildren();
 
           for (const suggestion of suggestions) {
-            placePrediction = suggestion.placePrediction;
+            const placePrediction = suggestion.placePrediction;
             // Create a link for the place, add an event handler to fetch the place.
             const a = document.createElement("a");
-
+            a.classList.add("information")
             a.addEventListener("click", () => {
               onPlaceSelected(placePrediction.toPlace());
             });
@@ -135,42 +92,69 @@
           }
         }
 
-        // Event handler for clicking on a suggested place.
+        function Output(name,location,rating,priceLevel,OpeningHours,id){
+          this.name=name;
+          this.location=location;
+          this.rating=rating;
+          if (priceLevel===NaN ||priceLevel===null||priceLevel===undefined)
+          {
+            priceLevel="沒有資料";
+          }
+          this.priceLevel=priceLevel;
+          this.OpeningHours=OpeningHours;
+          this.id=id;
+        }
         async function onPlaceSelected(place) {
           await place.fetchFields({
-            fields: ["displayName", "formattedAddress","location"],
+            fields:["location","displayName","formattedAddress","id","rating","priceLevel","regularOpeningHours","primaryType"],
           });
-
-          let placeText = document.createTextNode(
-            place.displayName + ": " + place.formattedAddress,
-          );
-
-          results.replaceChildren(placeText);
-          title.innerText = "Selected Place:";
-          input.value = "";
-          if (place.viewport) {
-            map.fitBounds(place.viewport);
-          } else {
-            map.setCenter(place.location);
-            map.setZoom(18);
-          }
-          
-          let content =
-            '<div id="infowindow-content">' +
-            '<span id="place-displayname" class="title">' +
-            place.displayName +
-            "</span><br />" +
-            '<span id="place-address">' +
-            place.formattedAddress +
-            "</span>" +
-            "</div>";
-      
-          updateInfoWindow(content, place.location);
-          marker.position = place.location;
-      
-          refreshToken(request);
-          button.classList.remove("disabled");
-          button.textContent="提交";
+            if(place.primaryType!=="restaurant")
+            {
+              alert("餐廳資料有誤");
+              return
+            }
+            let out=JSON.parse(localStorage.getItem("restaurant")) || []
+            for(element of out)
+            {
+              if(element.id===place.id)
+              {
+                alert("資料已經存在");
+                return
+              }
+            }
+            let outs= new Output(place.displayName,place.formattedAddress,place.rating,place.priceLevel,place.regularOpeningHours.periods,place.id);
+            out.push(outs);
+            localStorage.setItem("restaurant",JSON.stringify(out));
+            let placeText = document.createTextNode(
+              place.displayName + ": " + place.formattedAddress,
+            );
+  
+            results.replaceChildren(placeText);
+            title.innerText = "Selected Place:";
+            input.value = "";
+            if (place.viewport) {
+              map.fitBounds(place.viewport);
+            } else {
+              map.setCenter(place.location);
+              map.setZoom(18);
+            }
+            
+            let content =
+              '<div id="infowindow-content">' +
+              '<span id="place-displayname" class="title">' +
+              place.displayName +
+              "</span><br />" +
+              '<span id="place-address">' +
+              place.formattedAddress +
+              "</span>" +
+              "</div>";
+        
+            updateInfoWindow(content, place.location);
+            marker.position = place.location;
+        
+            refreshToken(request);
+            button.classList.remove("disabled");
+            button.textContent="提交";
         }
 
         // Helper function to refresh the session token.
@@ -190,16 +174,5 @@
             shouldFocus: false,
           });
         }
-        async function Get_data(place)
-        {
-          await place.fetchFields({
-            fields: ["id"],
-          })
-          let out=JSON.stringify(place.id);
-          localStorage.setItem("restaurant-"+place.id,out);
-        }
 
       initMap();
-    </script>
-  </body>
-</html>

@@ -63,26 +63,39 @@
         .button:hover {
             background-color: #218838;
         }
+        #map {
+            height: 400px;
+            width: 60%;
+          }
+        .submitbutton {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+          }
+        .submitbutton:active {
+            transform: scale(0.95);
+          }
+        .submitbutton.disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+          }
+        .information{
+            color:black;
+        }
+        .information:hover{
+            color: #007bff;
+            cursor: pointer;
+        }
     </style>
     <script>
-        function addRestaurant() {
-            const input = document.getElementById('restaurant-url');
-            const url = input.value.trim();
-            if (!url) {
-                alert('請輸入餐廳網址');
-                return;
-            }
-
-            let restaurants = JSON.parse(localStorage.getItem('restaurants')) || [];
-            restaurants.push(url);
-            localStorage.setItem('restaurants', JSON.stringify(restaurants));
-            input.value = '';
-            displayRestaurants();
-        }
-
         function displayRestaurants() {
             const restaurantsContainer = document.getElementById('restaurants');
-            const restaurants = JSON.parse(localStorage.getItem('restaurants')) || [];
+            const restaurants = JSON.parse(localStorage.getItem('restaurant')) || [];
 
             restaurantsContainer.innerHTML = '';
 
@@ -93,7 +106,7 @@
                 list.style.listStyleType = 'none';
                 restaurants.forEach(restaurant => {
                     const listItem = document.createElement('li');
-                    listItem.textContent = restaurant;
+                    listItem.textContent = restaurant.name+"-------"+restaurant.location;
                     listItem.style.padding = '10px';
                     listItem.style.borderBottom = '1px solid #ccc';
                     list.appendChild(listItem);
@@ -109,15 +122,16 @@
     <header>
         <h1>新增餐廳</h1>
     </header>
-    <div class="container">
-        <input type="text" id="restaurant-url" placeholder="輸入餐廳網址">
-        <button class="button" onclick="addRestaurant()">新增</button>
-        <a href="menu.html" class="button">返回</a>
-    </div>
-
+    <div id="map"></div>
+    <input type="text" id="input">
+    <div id="title"></div>
+    <ul id="results"></ul>
+    <button id="toggleButton" class="disabled submitbutton" onclick="displayRestaurants()">提交</button>
     <div class="container">
         <h2>所有餐廳</h2>
         <div id="restaurants"></div>
     </div>
+    <a href="menu.html" class="button">返回</a>
+    <script src="try.js"></script>
 </body>
 </html>
