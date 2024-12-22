@@ -138,14 +138,14 @@
                             {
                                 if(OpenHour[i] && date===OpenHour[i].day)
                                 {
-                                    if (OpenHour[i].open[1] === 0){
-                                        OpenHour[i].open[1]="00"
-                                    } 
-                                    if (OpenHour[i].close[1] === 0) {
-                                        OpenHour[i].close[1]="00"
-                                    }
                                     OpeningTimes+=`<li>${map[OpenHour[i].day]}時間：`;
                                     while(OpenHour[i]&&OpenHour[i].day===date){
+                                        if (OpenHour[i].open[1] === 0){
+                                            OpenHour[i].open[1]="00"
+                                        } 
+                                        if (OpenHour[i].close[1] === 0) {
+                                            OpenHour[i].close[1]="00"
+                                        }
                                         OpeningTimes+=`${OpenHour[i].open[0]}:${OpenHour[i].open[1]}~${OpenHour[i].close[0]}:${OpenHour[i].close[1]}  `
                                         i++
                                     }
