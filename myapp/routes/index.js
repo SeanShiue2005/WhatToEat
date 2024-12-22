@@ -33,6 +33,10 @@ const ListSchema = new mongoose.Schema({
     type:Array,
     required:true
   },
+  OpeningTimes:{
+    type:[{type:Boolean}],
+    required:true
+  },
   id:{
     type:String,
     required:true
@@ -51,24 +55,38 @@ router.get('/data', async function(req, res){
   console.log("getData");
 });
 
-router.post("/data",async(req,res)=>{
+router.post("/data",async function(req,res){
   try{
+    reqbody=req.body
       const restdata= new restList({
-          name:req.body.name,
-          location:req.body.location,
-          rating:req.body.rating,
-          priceLevel:req.body.priceLevel,
-          OpeningHours:req.body.OpeningHours,
-          id:req.body.id
+          name:reqbody.name,
+          location:reqbody.location,
+          rating:reqbody.rating,
+          priceLevel:reqbody.priceLevel,
+          OpeningHours:reqbody.OpeningHours,
+          OpeningTimes:reqbody.OpeningTimes,
+          id:reqbody.id
       });
-      console.log(typeof(req.body.OpeningHours))
-      console.log(req.body.OpeningHours)
-      console.log(typeof(req.body.priceLevel))
       const newrest = await restdata.save();
+      console.log(reqbody)
+      console.log(newrest)
       res.status(201).json(newrest);
   }   
   catch(err){
+    console.log(req.body)
+      console.log(typeof(req.body.OpeningHours))
       res.status(400).json({message:err.message});
+  }
+})
+
+router.delete("/data",async(req,res)=>{
+  try{
+    let deleterest = await restList.deleteOne({id:req.body.id});
+    res.status(201);
+  }
+  catch(err)
+  {
+    res.status(400).json({message:err.message})
   }
 })
 module.exports = router;

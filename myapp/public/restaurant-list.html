@@ -82,10 +82,41 @@
         .delete-button:hover {
             background-color: #c82333;
         }
+        nav ul          { position: absolute;
+            display: none;
+            list-style: none;
+            margin: 0;
+            padding: 0; 
+            border: 2px solid black;
+            width: calc(100%/6);
+            z-index:1;            }
+        nav:hover ul    { display: block; }
+        nav ul li       { 
+                    border-top: 2px solid RoyalBlue;
+                    background-color: white;
+                    color: black; }
+        nav ul:hover    {display: block;    }
     </style>
     
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
+        let map=["星期日","星期一","星期二","星期三","星期四","星期五","星期六",];
+
+        function deleteRestaurant(id){
+            $.ajax({
+                url: "/data",
+                type: "DELETE",
+                data: JSON.stringify({id:id}),         
+                contentType: "application/json",
+                success: () => {
+                  console.log("資料刪除");
+                },
+                error: (error) => {
+                  console.log(error);
+                },
+              });
+            renderRestaurants()
+        }
         function renderRestaurants(){
             $.get("/data",(restaurants=>{
                 const restaurantsContainer = document.getElementById('restaurants');
@@ -96,17 +127,44 @@
                 else {
                     const list = document.createElement('ul');
                     list.style.listStyleType = 'none';
-                    restaurants.forEach((restaurant, index) => {
+                    restaurants.forEach((restaurant) => {
                         const listItem = document.createElement('li');
                         listItem.className = 'restaurant-item';
+                        let OpeningTimes="<nav>營業時間<ul>";
+                        let date=0;
+                        let i=0;
+                        let OpenHour=restaurant.OpeningHours
+                            for(;date<7;date++)
+                            {
+                                if(OpenHour[i] && date===OpenHour[i].day)
+                                {
+                                    if (OpenHour[i].open[1] === 0){
+                                        OpenHour[i].open[1]="00"
+                                    } 
+                                    if (OpenHour[i].close[1] === 0) {
+                                        OpenHour[i].close[1]="00"
+                                    }
+                                    OpeningTimes+=`<li>${map[OpenHour[i].day]}時間：`;
+                                    while(OpenHour[i]&&OpenHour[i].day===date){
+                                        OpeningTimes+=`${OpenHour[i].open[0]}:${OpenHour[i].open[1]}~${OpenHour[i].close[0]}:${OpenHour[i].close[1]}  `
+                                        i++
+                                    }
+                                    OpeningTimes+="</li>";
+                                }
+                                else
+                                {
+                                    OpeningTimes+=`<li>${map[date]}沒有營業</li>`;
+                                }
+                            }
+                        OpeningTimes+="</ul></nav>";
                         listItem.innerHTML = `
                             <div class="restaurant-details">
                                 <h3>${restaurant.name}</h3>
                                 <span>價格範圍: ${mapping[original.indexOf(restaurant.priceLevel)]}</span>
                                 <span>評分: ${restaurant.rating} 顆星</span>
-                                <span>營業時間: ${restaurant.openingTime}</span>
+                                <span>${OpeningTimes}</span>
                             </div>
-                            <button class="delete-button" onclick="deleteRestaurant(${index})">刪除</button>
+                            <button class="delete-button" onclick="deleteRestaurant('${restaurant.id}')">刪除</button>
                         `;
                         list.appendChild(listItem);
                     });
@@ -117,11 +175,6 @@
         const restaurants = JSON.parse(localStorage.getItem('restaurant')) || [];
         const original=["FREE","INEXPENSIVE","MODERATE","EXPENSIVE","VERY EXPENSIVE","沒有資料"]
         const mapping=["免費","價錢便宜","價錢適中","價錢偏貴","非常昂貴","沒有資料"]
-        function deleteRestaurant(index) {
-            restaurants.splice(index, 1);
-            localStorage.setItem('restaurants', JSON.stringify(restaurants));
-            renderRestaurants();
-        }
 
 
         document.addEventListener('DOMContentLoaded', renderRestaurants);

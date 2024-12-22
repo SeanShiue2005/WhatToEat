@@ -84,7 +84,8 @@
           }
         }
 
-        function Output(name,location,rating,priceLevel,OpeningHours,id){
+        function Output(name,location,rating,priceLevel,OpeningHours,id,Brunch,Lunch,Dinner){
+          let OpeningArray=[]
           this.name=name;
           this.location=location;
           this.rating=rating;
@@ -93,13 +94,23 @@
             priceLevel="沒有資料";
           }
           this.priceLevel=priceLevel;
-          this.OpeningHours=OpeningHours;
+          for (period of OpeningHours)
+          {
+            let data={
+              day:period.open.day,
+              open:[period.open.hour,period.open.minute],
+              close:[period.close.hour,period.close.minute]
+            }
+            OpeningArray.push(data);
+          }
+          this.OpeningHours=OpeningArray;
+          this.OpeningTimes=[!!Brunch,!!Lunch,!!Dinner];
           this.id=id;
         }
 
         async function onPlaceSelected(place) {
           await place.fetchFields({
-            fields:["location","displayName","formattedAddress","id","rating","priceLevel","regularOpeningHours","types"],
+            fields:["location","displayName","formattedAddress","id","rating","priceLevel","regularOpeningHours","types","servesBrunch","servesLunch","servesDinner"],
           });
             for (element of place.types){
               if(element==="restaurant")
@@ -107,7 +118,7 @@
 
                 let out;
                 $.get("/data",out)
-            for(i=0; out!=undefined && i<out.length;i++)
+            for(i=0; out!=undefined &&i<out.length;i++)
             {
               if(element.id===place.id)
               {
@@ -120,8 +131,20 @@
               if (!button.classList.contains("disabled")) {
                 button.classList.add("disabled");
                 button.textContent = "已提交";
-                let outs= new Output(place.displayName,place.formattedAddress,place.rating,place.priceLevel,place.regularOpeningHours.weekdayDescriptions,place.id);
-                $.post("/data",outs);
+                let outs= new Output(place.displayName,place.formattedAddress,place.rating,place.priceLevel,place.regularOpeningHours.periods,place.id,place.servesBrunch,place.servesLunch,place.servesDinner);
+                console.log(place.regularOpeningHours.periods);
+                $.ajax({
+                  url: "/data",
+                  type: "POST",
+                  data: JSON.stringify(outs),
+                  contentType: "application/json",
+                  success: () => {
+                    console.log("資料上傳完成");
+                  },
+                  error: (error) => {
+                    console.log(error);
+                  },
+                });
                 displayRestaurants()
               }
             }

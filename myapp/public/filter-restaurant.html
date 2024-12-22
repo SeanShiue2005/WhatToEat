@@ -79,19 +79,21 @@
             margin-top: 20px;
         }
     </style>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
+        const original=["FREE","INEXPENSIVE","MODERATE","EXPENSIVE","VERY EXPENSIVE","沒有資料"]
+        const mapping=["免費","價錢便宜","價錢適中","價錢偏貴","非常昂貴","沒有資料"]
         function filterRestaurant() {
-            const openingTime = document.getElementById('opening-time').value;
-            const priceRange = document.getElementById('price-range').value;
-            const rating = document.getElementById('rating').value;
-            
-            const restaurantsContainer = document.getElementById('restaurants');
-            const restaurants = JSON.parse(localStorage.getItem('restaurants')) || [];
-
-            const filteredRestaurants = restaurants.filter(restaurant => {
-                return (openingTime === 'none' || restaurant.openingTime === openingTime) &&
-                       (priceRange === 'none' || restaurant.priceRange === priceRange) &&
-                       (rating === 'none' || restaurant.rating === rating);
+            $.get("/data",(restaurants)=>
+            {
+                const restaurantsContainer = document.getElementById('restaurants');
+                const openingTime = document.getElementById('opening-time').value;
+                const priceRange = document.getElementById('price-range').value;
+                const rating = document.getElementById('rating').value;
+                const filteredRestaurants = restaurants.filter(restaurant => {
+                return (openingTime === 'none' || restaurant.OpeningTimes[openingTime]) &&
+                       (priceRange === 'none' || restaurant.priceLevel === priceRange) &&
+                       (rating === 'none' || (restaurant.rating <= rating)&& restaurant.rating>rating-1);
             });
 
             restaurantsContainer.innerHTML = '';
@@ -103,7 +105,14 @@
                 list.style.listStyleType = 'none';
                 filteredRestaurants.forEach(restaurant => {
                     const listItem = document.createElement('li');
-                    listItem.textContent = restaurant.name;
+                    listItem.innerHTML = `<div class="restaurant-details">
+                                <h2 style="display:inline;">${restaurant.name}</h2>
+                                <h6 style="display:inline;">${restaurant.location}</h6><br>
+                                <span>價格範圍: ${mapping[original.indexOf(restaurant.priceLevel)]}</span>
+                                <span>評分: ${restaurant.rating} 顆星</span>
+                                <span>營業時間: ${restaurant.OpeningTimes.forEach((element)=> {return element})}</span>
+                            </div>
+                    `
                     listItem.style.padding = '10px';
                     listItem.style.borderBottom = '1px solid #ccc';
                     list.appendChild(listItem);
@@ -112,13 +121,18 @@
             }
 
             document.querySelector('.restaurants-container').style.display = 'block';
+
+            })
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const restaurantsContainer = document.getElementById('restaurants');
-            if (JSON.parse(localStorage.getItem('restaurants'))?.length === 0) {
-                restaurantsContainer.innerHTML = '<p>目前無餐廳。</p>';
-            }
+            $.get("/data",(restaurantdetails)=>
+            {
+                const restaurantsContainer = document.getElementById('restaurants');
+                if (restaurantdetails.length === 0) {
+                    restaurantsContainer.innerHTML = '<p>目前無餐廳。</p>';
+                }
+            })
         });
     </script>
 </head>
@@ -132,31 +146,31 @@
                 <label for="opening-time">營業時間</label>
                 <select id="opening-time">
                     <option value="none">無</option>
-                    <option value="morning">早上</option>
-                    <option value="afternoon">中午</option>
-                    <option value="evening">晚上</option>
+                    <option value="0">早上</option>
+                    <option value="1">中午</option>
+                    <option value="2">晚上</option>
                 </select>
             </div>
             <div>
                 <label for="price-range">價格</label>
                 <select id="price-range">
                     <option value="none">無</option>
-                    <option value="100-200">100-200</option>
-                    <option value="200-400">200-400</option>
-                    <option value="400-600">400-600</option>
-                    <option value="600-1000">600-1000</option>
-                    <option value="1000+">1000以上</option>
+                    <option value="FREE">免費</option>
+                    <option value="INEXPENSIVE">價錢便宜</option>
+                    <option value="MODERATE">價錢適中</option>
+                    <option value="EXPENSIVE">價錢昂貴</option>
+                    <option value="VERY EXPENSIVE">非常昂貴</option>
                 </select>
             </div>
             <div>
                 <label for="rating">評價</label>
                 <select id="rating">
                     <option value="none">無</option>
-                    <option value="5">5顆星</option>
-                    <option value="4">4顆星</option>
-                    <option value="3">3顆星</option>
-                    <option value="2">2顆星</option>
-                    <option value="1">1顆星</option>
+                    <option value="5">4~5顆星</option>
+                    <option value="4">3~4顆星</option>
+                    <option value="3">2~3顆星</option>
+                    <option value="2">1~2顆星</option>
+                    <option value="1">0~1顆星</option>
                 </select>
             </div>
             <button onclick="filterRestaurant()" class="button">篩選</button>
