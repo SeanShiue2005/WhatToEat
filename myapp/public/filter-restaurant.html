@@ -105,12 +105,38 @@
                 list.style.listStyleType = 'none';
                 filteredRestaurants.forEach(restaurant => {
                     const listItem = document.createElement('li');
+                    let OpeningTimesText="<nav>營業時間<ul>";
+                        let date=0;
+                        let i=0;
+                        let OpenHour=restaurant.OpeningHours
+                            for(;date<7;date++)
+                            {
+                                if(OpenHour[i] && date===OpenHour[i].day)
+                                {
+                                    if (OpenHour[i].open[1] === 0){
+                                        OpenHour[i].open[1]="00"
+                                    } 
+                                    if (OpenHour[i].close[1] === 0) {
+                                        OpenHour[i].close[1]="00"
+                                    }
+                                    OpeningTimesText+=`<li>${map[OpenHour[i].day]}時間：`;
+                                    while(OpenHour[i]&&OpenHour[i].day===date){
+                                        OpeningTimesText+=`${OpenHour[i].open[0]}:${OpenHour[i].open[1]}~${OpenHour[i].close[0]}:${OpenHour[i].close[1]}  `
+                                        i++
+                                    }
+                                    OpeningTimesText+="</li>";
+                                }
+                                else
+                                {
+                                    OpeningTimesText+=`<li>${map[date]}沒有營業</li>`;
+                                }
+                            }
                     listItem.innerHTML = `<div class="restaurant-details">
                                 <h2 style="display:inline;">${restaurant.name}</h2>
                                 <h6 style="display:inline;">${restaurant.location}</h6><br>
                                 <span>價格範圍: ${mapping[original.indexOf(restaurant.priceLevel)]}</span>
                                 <span>評分: ${restaurant.rating} 顆星</span>
-                                <span>營業時間: ${restaurant.OpeningTimes.forEach((element)=> {return element})}</span>
+                                <span>營業時間: ${OpeningTimesText}</span>
                             </div>
                     `
                     listItem.style.padding = '10px';
