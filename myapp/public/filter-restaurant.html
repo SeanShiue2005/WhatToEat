@@ -83,6 +83,7 @@
     <script>
         const original=["FREE","INEXPENSIVE","MODERATE","EXPENSIVE","VERY EXPENSIVE","沒有資料"]
         const mapping=["免費","價錢便宜","價錢適中","價錢偏貴","非常昂貴","沒有資料"]
+        const map=["星期日","星期一","星期二","星期三","星期四","星期五","星期六",];
         function filterRestaurant() {
             $.get("/data",(restaurants)=>
             {
