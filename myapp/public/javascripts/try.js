@@ -112,13 +112,12 @@
           await place.fetchFields({
             fields:["location","displayName","formattedAddress","id","rating","priceLevel","regularOpeningHours","types","servesBrunch","servesLunch","servesDinner"],
           });
+          $.get("/data",(ou=>{
+            out = ou||[];
             for (element of place.types){
               if(element==="restaurant")
               {
-
-                let out;
-                $.get("/data",out)
-            for(i=0; out!=undefined &&i<out.length;i++)
+            for(element of out)
             {
               if(element.id===place.id)
               {
@@ -179,9 +178,10 @@
             button.classList.remove("disabled");
             button.textContent="提交";
             return
-          }}
+          }
           alert("這不是間餐廳");
           return;
+        }}))
         }
 
         // Helper function to refresh the session token.
