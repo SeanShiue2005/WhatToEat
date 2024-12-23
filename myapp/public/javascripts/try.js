@@ -139,12 +139,12 @@
                   contentType: "application/json",
                   success: () => {
                     console.log("資料上傳完成");
+                    displayRestaurants()
                   },
                   error: (error) => {
                     console.log(error);
                   },
                 });
-                displayRestaurants()
               }
             }
             let placeText = document.createTextNode(
