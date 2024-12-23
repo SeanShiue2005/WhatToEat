@@ -126,7 +126,6 @@
               }
             }
             button.onclick=() => {
-              // 檢查按鈕是否已經是暗的狀態
               if (!button.classList.contains("disabled")) {
                 button.classList.add("disabled");
                 button.textContent = "已提交";
@@ -184,10 +183,7 @@
         alert("這不是間餐廳");
         return;}))
         }
-
-        // Helper function to refresh the session token.
         async function refreshToken(request) {
-          // Create a new session token and add it to the request.
           token = new google.maps.places.AutocompleteSessionToken()
           request.sessionToken = token;
           return request;
