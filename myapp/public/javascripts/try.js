@@ -117,9 +117,9 @@
             for (element of place.types){
               if(element==="restaurant")
               {
-            for(element of out)
+            for(ele of out)
             {
-              if(element.id===place.id)
+              if(ele.id===place.id)
               {
                 alert("資料已經存在");
                 return
@@ -179,9 +179,10 @@
             button.textContent="提交";
             return
           }
-          alert("這不是間餐廳");
-          return;
-        }}))
+
+        }
+        alert("這不是間餐廳");
+        return;}))
         }
 
         // Helper function to refresh the session token.
