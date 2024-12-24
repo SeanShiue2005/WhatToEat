@@ -110,12 +110,12 @@
                 contentType: "application/json",
                 success: () => {
                   console.log("資料刪除");
+                  renderRestaurants()
                 },
                 error: (error) => {
                   console.log(error);
                 },
               });
-            renderRestaurants()
         }
         function renderRestaurants(){
             $.get("/data",(restaurants=>{
