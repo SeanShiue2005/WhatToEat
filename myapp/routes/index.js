@@ -82,7 +82,7 @@ router.post("/data",async function(req,res){
 router.delete("/data",async(req,res)=>{
   try{
     let deleterest = await restList.deleteOne({id:req.body.id});
-    res.status(201);
+    res.status(201).json({message:deleterest.message});
   }
   catch(err)
   {
