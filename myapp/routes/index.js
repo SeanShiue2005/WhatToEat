@@ -40,6 +40,10 @@ const ListSchema = new mongoose.Schema({
   id:{
     type:String,
     required:true
+  },
+  latlong:{
+    type:Object,
+    required:true
   }
 })
 const restList = mongoose.model('restList', ListSchema);
@@ -95,7 +99,8 @@ router.post("/data",async function(req,res){
           priceLevel:reqbody.priceLevel,
           OpeningHours:reqbody.OpeningHours,
           OpeningTimes:reqbody.OpeningTimes,
-          id:reqbody.id
+          id:reqbody.id,
+          latlong:reqbody.latlong
       });
       const newrest = await restdata.save();
 

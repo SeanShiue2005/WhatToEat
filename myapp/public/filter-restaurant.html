@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>餐廳網站 - 篩選餐廳</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://code.jquery.com/jquery-3.6.1.js" integrity="sha256-3zlB5s2uwoUzrXK3BT7AX3FyvojsraNFxCc2vC/7pNI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -54,7 +58,8 @@
             border: 1px solid #ccc;
             border-radius: 5px;
         }
-        .button {
+        .randombutton,.button {
+            margin: 5px;
             background-color: #28a745;
             color: #fff;
             padding: 10px 20px;
@@ -65,7 +70,7 @@
             display: inline-block;
             margin-left: 10px;
         }
-        .button:hover {
+        .randombutton:hover,.button:hover {
             background-color: #218838;
         }
         .back-button {
@@ -78,30 +83,90 @@
             display: none;
             margin-top: 20px;
         }
+        .randombutton.disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+          }
+          .pop-out {
+            text-align: center;
+            width: 100%;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.8);
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        
+        .pop-out-panel {
+            padding: 20px;
+            min-width:425px;
+            min-height: 30vh;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            display: none;
+        }
+        .panel-header {
+            font-size: 1.5rem;
+            font-weight: bold;  
+            font-weight: 900;
+            padding: 2% 0;
+            border-bottom: solid rgba(53, 53, 53, 0.756) 1px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        .panel-content {
+            padding: 3% 0;
+        }
+
+        .panel-container {
+            padding-left:3%;
+            padding-right:3%;
+        }
+
+        .panel-button {
+            position: absolute;
+            right: 0;
+            top: 0;
+            padding-top: 2%;
+            padding-right: 3%;
+        }
+        #map {
+            height: 300px;
+            width: 100%;
+          }
     </style>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
+        (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})
+      ({key: "AIzaSyBe_lVY291SKiWQQizdzzME1LvDVYQ3C94", v: "weekly",region:"tw"});
         const original=["FREE","INEXPENSIVE","MODERATE","EXPENSIVE","VERY EXPENSIVE","沒有資料"]
         const mapping=["免費","價錢便宜","價錢適中","價錢偏貴","非常昂貴","沒有資料"]
         const map=["星期日","星期一","星期二","星期三","星期四","星期五","星期六",];
+        let restaurant_list=[];
+        let filteredRestaurants=[];
+        let gmap;
+        let marker;
         function filterRestaurant() {
-            $.get("/data",(restaurants)=>
-            {
+            console.log(restaurant_list);
                 const restaurantsContainer = document.getElementById('restaurants');
                 const openingTime = document.getElementById('opening-time').value;
                 const priceRange = document.getElementById('price-range').value;
                 const rating = document.getElementById('rating').value;
-                const filteredRestaurants = restaurants.filter(restaurant => {
+                filteredRestaurants = restaurant_list.filter(restaurant => {
                 return (openingTime === 'none' || restaurant.OpeningTimes[openingTime]) &&
                        (priceRange === 'none' || restaurant.priceLevel === priceRange) &&
-                       (rating === 'none' || (restaurant.rating <= rating)&& restaurant.rating>rating-1);
-            });
-
+                       (rating === 'none' || (restaurant.rating <= rating)&& restaurant.rating>rating-1)})||[];
             restaurantsContainer.innerHTML = '';
 
             if (filteredRestaurants.length === 0) {
-                restaurantsContainer.innerHTML = '<p>目前無餐廳。</p>';
+                restaurantsContainer.innerHTML = '<p>沒有符合的結果</p>';
+                randombutton.classList.add("disabled");
             } else {
+                randombutton.classList.remove("disabled");
                 const list = document.createElement('ul');
                 list.style.listStyleType = 'none';
                 filteredRestaurants.forEach(restaurant => {
@@ -142,25 +207,99 @@
                     `
                     listItem.style.padding = '10px';
                     listItem.style.borderBottom = '1px solid #ccc';
+                    restaurantsContainer.appendChild(list);
                     list.appendChild(listItem);
                 });
-                restaurantsContainer.appendChild(list);
             }
-
             document.querySelector('.restaurants-container').style.display = 'block';
+        }
+        async function RandomSelect(){
+            if(filteredRestaurants.length!=0)
+            {
+                gsap.to(".pop-out", { duration: 0.5, opacity: 1, display: "block" });
+                gsap.fromTo(".pop-out-panel",{y:"20%"},{y:"-50%",duration:0.5,ease:"power",display:"block",opacity: 1})
+                let restaurant=filteredRestaurants[Math.floor(Math.random()*filteredRestaurants.length)];
+                const listItem = document.querySelector(".panel-content")
+                    let OpeningTimesText="<nav>營業時間<ul>";
+                        let date=0;
+                        let i=0;
+                        let OpenHour=restaurant.OpeningHours
+                            for(;date<7;date++)
+                            {
+                                if(OpenHour[i] && date===OpenHour[i].day)
+                                {
+                                    OpeningTimesText+=`<li>${map[OpenHour[i].day]}時間：`;
+                                    while(OpenHour[i]&&OpenHour[i].day===date){
+                                        if (OpenHour[i].open[1] == 0){
+                                            OpenHour[i].open[1]="00"
+                                        } 
+                                        if (OpenHour[i].close[1] == 0) {
+                                            OpenHour[i].close[1]="00"
+                                        }
+                                        OpeningTimesText+=`${OpenHour[i].open[0]}:${OpenHour[i].open[1]}~${OpenHour[i].close[0]}:${OpenHour[i].close[1]}  `
+                                        i++
+                                    }
+                                    OpeningTimesText+="</li>";
+                                }
+                                else
+                                {
+                                    OpeningTimesText+=`<li>${map[date]}沒有營業</li>`;
+                                }
+                            }
+                    listItem.innerHTML = `
+                                <h2 style="display:inline;">${restaurant.name}</h2><br>
+                                <h6 style="display:inline;">${restaurant.location}</h6><br>
+                                <span>價格範圍: ${mapping[original.indexOf(restaurant.priceLevel)]}</span>
+                                <span>評分: ${restaurant.rating} 顆星</span>
+                                <span>營業時間: ${OpeningTimesText}</span>
+                    `
+                    gmap.setCenter(restaurant.latlong);
+                    gmap.setZoom(16)
+                    marker.position=restaurant.latlong;
+        }}
 
-            })
+        function closePop () {
+            gsap.to(".pop-out", { duration: 0.5, opacity: 0, display: "none" });
+            gsap.to(".pop-out-panel", { duration: 0.5, opacity: 0, display: "none" });
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            let randombutton=document.getElementById("randombutton");
             $.get("/data",(restaurantdetails)=>
             {
                 const restaurantsContainer = document.getElementById('restaurants');
                 if (restaurantdetails.length === 0) {
                     restaurantsContainer.innerHTML = '<p>目前無餐廳。</p>';
                 }
+                restaurant_list=restaurantdetails;
             })
+            $(".pop-out").hide();
+            $(".panel-button").click(function () {
+                closePop();
+            });
+            
+            $(document).keydown(function (e) {
+                if (e.key === "Escape") {
+                    closePop();
+                }
+            });
         });
+        async function initMap(){
+            const { Map } = await google.maps.importLibrary("maps");
+            const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+            let map_show=document.getElementById("map");
+            gmap = new Map(map_show, {
+                        zoom: 16,
+                        center: {lat:0,lng:0},
+                        mapId: "DEMO_MAP_ID",
+                    });
+            marker = new AdvancedMarkerElement({
+                        map: gmap,
+                        position: {lat:0,lng:0},
+                        title: "地點",
+                      });
+                    }
+        initMap()
     </script>
 </head>
 <body>
@@ -200,7 +339,10 @@
                     <option value="1">0~1顆星</option>
                 </select>
             </div>
-            <button onclick="filterRestaurant()" class="button">篩選</button>
+            <div>
+                <button onclick="filterRestaurant()" class="button">篩選</button>
+                <button onclick="RandomSelect()" class="disabled randombutton" id="randombutton">隨機</button>
+            </div>
         </div>
         <div class="main-content">
             <div class="restaurants-container">
@@ -210,5 +352,18 @@
             <a href="menu.html" class="button back-button">返回</a>
         </div>
     </div>
+    <section class="pop-out"></section>
+        <div class="pop-out-panel">
+            <div class="panel-header">
+                <div class="panel-container">
+                    餐廳資訊
+                </div>
+                <button class="panel-button"><i class="fa-solid fa-x"></i></button>
+            </div>
+            <div class="panel-content">
+            </div>
+            <div id="map"></div>
+        </div>
+    </section>
 </body>
 </html>

@@ -33,7 +33,7 @@
         marker = new AdvancedMarkerElement({
           map: map,
           position: position,
-          title: "Uluru",
+          title: "地點",
         });
           infoWindow = new google.maps.InfoWindow({});
           token = new google.maps.places.AutocompleteSessionToken();
@@ -84,7 +84,7 @@
           }
         }
 
-        function Output(name,location,rating,priceLevel,OpeningHours,id,Brunch,Lunch,Dinner){
+        function Output(name,location,rating,priceLevel,OpeningHours,id,Brunch,Lunch,Dinner,latlong){
           let OpeningArray=[]
           this.name=name;
           this.location=location;
@@ -106,11 +106,12 @@
           this.OpeningHours=OpeningArray;
           this.OpeningTimes=[!!Brunch,!!Lunch,!!Dinner];
           this.id=id;
+          this.latlong=latlong
         }
 
         async function onPlaceSelected(place) {
           await place.fetchFields({
-            fields:["location","displayName","formattedAddress","id","rating","priceLevel","regularOpeningHours","types","servesBrunch","servesLunch","servesDinner"],
+            fields:["location","displayName","formattedAddress","id","rating","priceLevel","regularOpeningHours","types","servesBrunch","servesLunch","servesDinner","location"],
           });
           $.ajax({url:"/verify_data",
                   type:"POST",
@@ -122,7 +123,7 @@
               if (!button.classList.contains("disabled")) {
                 button.classList.add("disabled");
                 button.textContent = "已提交";
-                let outs= new Output(place.displayName,place.formattedAddress,place.rating,place.priceLevel,place.regularOpeningHours.periods,place.id,place.servesBrunch,place.servesLunch,place.servesDinner);
+                let outs= new Output(place.displayName,place.formattedAddress,place.rating,place.priceLevel,place.regularOpeningHours.periods,place.id,place.servesBrunch,place.servesLunch,place.servesDinner,place.location);
                 console.log(place.regularOpeningHours.periods);
                 $.ajax({
                   url: "/data",
