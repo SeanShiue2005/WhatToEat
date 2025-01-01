@@ -55,6 +55,36 @@ router.get('/data', async function(req, res){
   console.log("getData");
 });
 
+async function verify(types,id)
+{
+  const data = await restList.find()
+  for (element of types){
+    if(element==="restaurant")
+    {
+      for(ele of data)
+      {
+        if(ele.id===id)
+        {
+          throw new Error( "餐廳已經存在")
+        }
+      }
+      return data;
+    }
+  }
+  throw new Error("這不是間餐廳")
+}
+router.post("/verify_data",async function(req,res){
+  try{
+    let types=req.body.types;
+    const id=req.body.id;
+    let verify_ans=await verify(types,id);
+    res.json(verify_ans)
+  }
+  catch(err){
+    res.status(500).json({message:err.message})
+  }
+})
+
 router.post("/data",async function(req,res){
   try{
     reqbody=req.body
@@ -68,6 +98,7 @@ router.post("/data",async function(req,res){
           id:reqbody.id
       });
       const newrest = await restdata.save();
+
       console.log(reqbody)
       console.log(newrest)
       res.status(201).json(newrest);

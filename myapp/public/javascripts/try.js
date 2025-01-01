@@ -112,20 +112,13 @@
           await place.fetchFields({
             fields:["location","displayName","formattedAddress","id","rating","priceLevel","regularOpeningHours","types","servesBrunch","servesLunch","servesDinner"],
           });
-          $.get("/data",(ou=>{
-            out = ou||[];
-            for (element of place.types){
-              if(element==="restaurant")
-              {
-            for(ele of out)
-            {
-              if(ele.id===place.id)
-              {
-                alert("資料已經存在");
-                return
-              }
-            }
-            button.onclick=() => {
+          $.ajax({url:"/verify_data",
+                  type:"POST",
+                  data:JSON.stringify({types:place.types,id:place.id}),
+                  contentType:"application/json",
+                  success:(ou)=>{
+                    console.log(ou);
+              button.onclick=() => {
               if (!button.classList.contains("disabled")) {
                 button.classList.add("disabled");
                 button.textContent = "已提交";
@@ -143,9 +136,7 @@
                   error: (error) => {
                     console.log(error);
                   },
-                });
-              }
-            }
+                })}};
             let placeText = document.createTextNode(
               place.displayName + ": " + place.formattedAddress,
             );
@@ -176,13 +167,14 @@
             refreshToken(request);
             button.classList.remove("disabled");
             button.textContent="提交";
-            return
           }
+        ,
+        error:(err)=>{
+        {
+          alert(err.responseJSON.message);
+        }
+        }})};
 
-        }
-        alert("這不是間餐廳");
-        return;}))
-        }
         async function refreshToken(request) {
           token = new google.maps.places.AutocompleteSessionToken()
           request.sessionToken = token;
