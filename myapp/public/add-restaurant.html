@@ -32,7 +32,17 @@
             background-color: #fff;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+        .searchcontainer
+        {
+            list-style-type: none;
+            width: 80%;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         }
         h1 {
             text-align: center;
@@ -87,6 +97,10 @@
           }
         .information{
             color:black;
+            margin-left: 20px;
+            border-bottom-width: 1px;
+            border-bottom-style: solid;
+            border-bottom-color: rgb(204,204,204);
         }
         .information:hover{
             color: #007bff;
@@ -126,7 +140,7 @@
     <div id="map"></div>
     <input type="text" id="input" placeholder="輸入你想查找的餐廳名稱">
     <div id="title"></div>
-    <ul id="results" class="container"></ul>
+    <div id="results" class="searchcontainer"></div>
     <button id="toggleButton" class="disabled submitbutton" >提交</button>
     <div class="container">
         <h2>所有餐廳</h2>

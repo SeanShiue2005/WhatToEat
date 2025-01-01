@@ -51,12 +51,7 @@
             results.replaceChildren();
             return;
           }
-
-          // Add the latest char sequence to the request.
           request.input = input.target.value;
-
-          // Fetch autocomplete suggestions and show them in a list.
-          // @ts-ignore
           const { suggestions } =
             await google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions(
               request,
@@ -74,7 +69,6 @@
               onPlaceSelected(placePrediction.toPlace());
             });
             a.classList.add("information")
-            a.style.marginLeft='20px';
             a.innerText = placePrediction.text.toString();
 
             // Create a new list element.
