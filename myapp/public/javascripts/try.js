@@ -62,7 +62,7 @@
               request,
             );
 
-          title.innerText = 'Query predictions for "' + request.input + '"';
+          title.innerText = '"' + request.input + '"的搜尋結果是:';
           // Clear the list first.
           results.replaceChildren();
 
@@ -70,15 +70,15 @@
             const placePrediction = suggestion.placePrediction;
             // Create a link for the place, add an event handler to fetch the place.
             const a = document.createElement("a");
-            a.classList.add("information")
             a.addEventListener("click", () => {
               onPlaceSelected(placePrediction.toPlace());
             });
+            a.classList.add("information")
+            a.style.marginLeft='20px';
             a.innerText = placePrediction.text.toString();
 
             // Create a new list element.
             const li = document.createElement("li");
-
             li.appendChild(a);
             results.appendChild(li);
           }
