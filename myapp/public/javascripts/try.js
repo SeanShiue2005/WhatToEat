@@ -58,12 +58,10 @@
             );
 
           title.innerText = '"' + request.input + '"的搜尋結果是:';
-          // Clear the list first.
           results.replaceChildren();
 
           for (const suggestion of suggestions) {
             const placePrediction = suggestion.placePrediction;
-            // Create a link for the place, add an event handler to fetch the place.
             const a = document.createElement("a");
             a.addEventListener("click", () => {
               onPlaceSelected(placePrediction.toPlace());
@@ -71,7 +69,6 @@
             a.classList.add("information")
             a.innerText = placePrediction.text.toString();
 
-            // Create a new list element.
             const li = document.createElement("li");
             li.appendChild(a);
             results.appendChild(li);
